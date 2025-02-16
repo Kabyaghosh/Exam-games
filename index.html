@@ -6,13 +6,15 @@
     <title>Chrome Dino Exam Edition</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { text-align: center; background: #f4f4f4; overflow: hidden; }
-        .game-container { position: relative; width: 800px; height: 300px; background: white; margin: 50px auto; border: 2px solid black; overflow: hidden; }
-        .player { width: 50px; height: 50px; position: absolute; bottom: 20px; left: 50px; transition: 0.1s; }
+        body { text-align: center; background: #ddd; overflow: hidden; }
+        h1 { color: #222; }
+        .game-container { position: relative; width: 800px; height: 300px; background: #fff; margin: 50px auto; border: 4px solid #222; overflow: hidden; box-shadow: 5px 5px 10px rgba(0,0,0,0.3); }
+        .player { width: 60px; height: 60px; position: absolute; bottom: 20px; left: 50px; transition: 0.2s; }
         .enemy-container { position: absolute; bottom: 20px; right: -50px; text-align: center; }
         .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
-        .enemy-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
-        .message { font-size: 24px; font-weight: bold; display: none; }
+        .enemy-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: red; }
+        .score { position: absolute; top: 10px; right: 20px; font-size: 20px; font-weight: bold; color: #222; }
+        .message { font-size: 24px; font-weight: bold; display: none; color: green; }
     </style>
 </head>
 <body>
@@ -20,6 +22,7 @@
     <p>Press <strong>Space</strong> to jump and avoid exams!</p>
     
     <div class="game-container">
+        <span class="score">Score: <span id="score">0</span></span>
         <img src="IMG_1144.jpeg" class="player" id="player">
         <div class="enemy-container" id="enemyContainer">
             <div class="enemy-label" id="enemyLabel">Class 1</div>
@@ -35,18 +38,21 @@
         let enemyLabel = document.getElementById("enemyLabel");
         let enemy = document.getElementById("enemy");
         let message = document.getElementById("message");
+        let scoreDisplay = document.getElementById("score");
 
         let classes = 1;  
         let jumping = false;
+        let score = 0;
+        let playerPos = 50; // Player starts at 50px left
 
         function jump() {
             if (!jumping) {
                 jumping = true;
-                player.style.bottom = "120px";
+                player.style.bottom = "150px"; // Higher jump
                 setTimeout(() => {
                     player.style.bottom = "20px";
                     jumping = false;
-                }, 400);
+                }, 600); // Longer jump duration
             }
         }
 
@@ -65,24 +71,32 @@
 
             enemyLabel.innerText = `Class ${classes}`;
             enemyContainer.style.right = "-50px";
-
-            let interval = setInterval(() => {
+            let enemyInterval = setInterval(() => {
                 let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
                 enemyContainer.style.right = (enemyPos + 5) + "px";
+
+                // Move player forward but stop at center (350px)
+                if (playerPos < 350) {
+                    playerPos += 2;
+                    player.style.left = playerPos + "px";
+                }
 
                 let playerBottom = parseInt(getComputedStyle(player).bottom);
                 let enemyRight = parseInt(getComputedStyle(enemyContainer).right);
 
-                if (enemyRight > 600 && enemyRight < 680 && playerBottom < 50) {
+                // Collision detection
+                if (enemyRight > (800 - playerPos - 60) && enemyRight < (800 - playerPos) && playerBottom < 50) {
                     message.innerHTML = `You failed in Class ${classes} 😭`;
                     message.style.display = "block";
-                    clearInterval(interval);
+                    clearInterval(enemyInterval);
                     return;
                 }
 
                 if (enemyRight >= 800) {
-                    clearInterval(interval);
+                    clearInterval(enemyInterval);
                     classes++;
+                    score += 10;
+                    scoreDisplay.innerText = score;
                     moveEnemy();
                 }
             }, 30);
