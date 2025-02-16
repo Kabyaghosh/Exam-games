@@ -17,39 +17,32 @@
             overflow: hidden; 
             box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
             background: url('BG.png') repeat-x; 
-            background-size: cover; /* Fixes BG gap issue */
+            background-size: cover;
         }
         .player { 
             width: 60px; height: 60px; 
-            position: absolute; bottom: 80px; left: 100px;
+            position: absolute; bottom: 0px; left: 100px;
         }
         .enemy-container { 
-            position: absolute; bottom: 80px; right: -50px; 
+            position: absolute; bottom: 0px; right: -50px; 
             text-align: center;
         }
         .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
         .enemy-label {
-            font-size: 14px; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            color: red;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 3px 6px;
-            border-radius: 5px;
+            font-size: 14px; font-weight: bold; margin-bottom: 5px; 
+            color: red; background-color: rgba(0, 0, 0, 0.5);
+            padding: 3px 6px; border-radius: 5px;
         }
         .score { 
             position: absolute; 
             top: 10px; right: 20px; 
             font-size: 20px; font-weight: bold; 
-            color: #fff;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
+            color: #fff; background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px; border-radius: 5px;
         }
         .message { 
-            font-size: 24px; font-weight: bold; 
-            display: none; color: green; 
-            cursor: pointer; margin-top: 20px;
+            font-size: 24px; font-weight: bold; display: none; 
+            color: green; cursor: pointer; margin-top: 20px;
         }
     </style>
 </head>
@@ -80,15 +73,15 @@
         let classes = 1;
         let gameOver = false;
         let velocityY = 0;
-        let gravity = 0.6;
+        let gravity = 0.5;
         let isOnGround = true;
-        let backgroundX = 0;
-        let playerY = 80; // Start at correct ground position
+        let playerY = 0; // Start on ground
+        let jumpForce = 12;
 
         function jump() {
             if (isOnGround && !gameOver) {
-                velocityY = -12; // Jump force
-                isOnGround = false;
+                velocityY = -jumpForce; // Apply jump force
+                isOnGround = false; // Hero is now in the air
             } else if (gameOver) {
                 restartGame();
             }
@@ -101,15 +94,13 @@
         });
 
         function updatePlayer() {
-            if (!isOnGround) {
-                velocityY += gravity;
-                playerY += velocityY;
-            }
+            velocityY += gravity;
+            playerY += velocityY;
 
-            if (playerY <= 80) { 
-                playerY = 80;
-                isOnGround = true;
-                velocityY = 0;
+            if (playerY > 0) { 
+                playerY = 0; 
+                isOnGround = true; 
+                velocityY = 0; 
             }
 
             player.style.bottom = `${playerY}px`;
@@ -124,7 +115,7 @@
             }
 
             enemyLabel.innerText = `Class ${classes}`;
-            let enemySpeed = 2.5 + classes * 0.2; // Reduced enemy speed
+            let enemySpeed = 2 + classes * 0.1; // Slower enemy
             let enemyPos = 800;
 
             function enemyMoveLoop() {
@@ -162,9 +153,10 @@
         }
 
         function moveBackground() {
+            let backgroundX = 0;
             function scrollBackground() {
                 if (!gameOver) {
-                    backgroundX -= 2; // Move smoothly
+                    backgroundX -= 2;
                     gameContainer.style.backgroundPositionX = `${backgroundX}px`;
                     requestAnimationFrame(scrollBackground);
                 }
@@ -177,7 +169,7 @@
             classes = 1;
             scoreDisplay.innerText = "Passed Class 0";
             message.style.display = "none";
-            playerY = 80; // Reset player to ground level
+            playerY = 0;
             isOnGround = true;
             velocityY = 0;
             moveEnemy();
