@@ -3,15 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Run: The Exam Escape</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Chrome Dino Exam Edition</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { text-align: center; background: #f4f4f4; overflow: hidden; }
+        .game-container { position: relative; width: 800px; height: 300px; background: white; margin: 50px auto; border: 2px solid black; overflow: hidden; }
+        .player { width: 50px; height: 50px; position: absolute; bottom: 20px; left: 50px; transition: 0.1s; }
+        .enemy-container { position: absolute; bottom: 20px; right: -50px; text-align: center; }
+        .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
+        .enemy-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .message { font-size: 24px; font-weight: bold; display: none; }
+    </style>
 </head>
 <body>
-    <div id="game">
-        <div id="player"></div> <!-- Player Icon -->
-        <div id="exam"></div> <!-- Class Enemy -->
-        <p id="score">Class: 1</p>
+    <h1>Exam Survival Game</h1>
+    <p>Press <strong>Space</strong> to jump and avoid exams!</p>
+    
+    <div class="game-container">
+        <img src="IMG_1144.jpeg" class="player" id="player">
+        <div class="enemy-container" id="enemyContainer">
+            <div class="enemy-label" id="enemyLabel">Class 1</div>
+            <img src="enemy.png" class="enemy" id="enemy">
+        </div>
     </div>
-    <script src="script.js"></script>
+    
+    <p class="message" id="message"></p>
+    
+    <script>
+        let player = document.getElementById("player");
+        let enemyContainer = document.getElementById("enemyContainer");
+        let enemyLabel = document.getElementById("enemyLabel");
+        let enemy = document.getElementById("enemy");
+        let message = document.getElementById("message");
+
+        let classes = 1;  
+        let jumping = false;
+
+        function jump() {
+            if (!jumping) {
+                jumping = true;
+                player.style.bottom = "120px";
+                setTimeout(() => {
+                    player.style.bottom = "20px";
+                    jumping = false;
+                }, 400);
+            }
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.code === "Space") {
+                jump();
+            }
+        });
+
+        function moveEnemy() {
+            if (classes > 12) {
+                message.innerHTML = "Congratulations! You have degrees that are useless!";
+                message.style.display = "block";
+                return;
+            }
+
+            enemyLabel.innerText = `Class ${classes}`;
+            enemyContainer.style.right = "-50px";
+
+            let interval = setInterval(() => {
+                let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
+                enemyContainer.style.right = (enemyPos + 5) + "px";
+
+                let playerBottom = parseInt(getComputedStyle(player).bottom);
+                let enemyRight = parseInt(getComputedStyle(enemyContainer).right);
+
+                if (enemyRight > 600 && enemyRight < 680 && playerBottom < 50) {
+                    message.innerHTML = `You failed in Class ${classes} 😭`;
+                    message.style.display = "block";
+                    clearInterval(interval);
+                    return;
+                }
+
+                if (enemyRight >= 800) {
+                    clearInterval(interval);
+                    classes++;
+                    moveEnemy();
+                }
+            }, 30);
+        }
+
+        moveEnemy();
+    </script>
 </body>
 </html>
