@@ -24,7 +24,6 @@
             left: 0;
             background: url('BG.png') repeat-x; /* Replace with your background image */
             background-size: cover;
-            transition: left 0s ease;
         }
         .player { width: 60px; height: 60px; position: absolute; bottom: 80px; left: 50px; transition: 0.2s; }
         .enemy-container { position: absolute; bottom: 80px; right: -50px; text-align: center; }
@@ -146,9 +145,11 @@
                 // Move background to simulate movement
                 let bgPos = parseInt(getComputedStyle(background).left);
                 background.style.left = (bgPos - 5) + "px";
-                
+
                 // Reset background position to simulate infinite scroll
-                if (bgPos <= -1600) background.style.left = "0px";
+                if (bgPos <= -1600) {
+                    background.style.left = "0px";
+                }
 
                 // Move player forward but stop at center (350px)
                 if (playerPos < 350) {
