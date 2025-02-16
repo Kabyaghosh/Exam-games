@@ -17,7 +17,7 @@
             overflow: hidden; 
             box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
             background: url('BG.png') repeat-x; /* Replace with your background */
-            background-size: cover;
+            background-size: 800px 100%; /* Ensures smooth joining */
         }
         .player { 
             width: 60px; height: 60px; 
@@ -84,6 +84,7 @@
         let velocityY = 0;
         let gravity = 0.6;
         let isOnGround = true;
+        let backgroundX = 0;
 
         function jump() {
             if (isOnGround && !gameOver) {
@@ -120,7 +121,7 @@
             }
 
             enemyLabel.innerText = `Class ${classes}`;
-            let enemySpeed = 5 + classes; // Speed increases with each class
+            let enemySpeed = 4 + classes * 0.5; // Slower speed increase
             let enemyPos = 800;
 
             function enemyMoveLoop() {
@@ -158,11 +159,10 @@
         }
 
         function moveBackground() {
-            let bgPos = 0;
             function scrollBackground() {
                 if (!gameOver) {
-                    bgPos -= 2;
-                    gameContainer.style.backgroundPosition = `${bgPos}px 0`;
+                    backgroundX -= 2; // Move smoothly
+                    gameContainer.style.backgroundPosition = `${backgroundX}px 0`;
                     requestAnimationFrame(scrollBackground);
                 }
             }
