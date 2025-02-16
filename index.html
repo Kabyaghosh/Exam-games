@@ -12,23 +12,24 @@
             position: relative; 
             width: 800px; 
             height: 300px; 
-            background: #fff; 
             margin: 50px auto; 
             border: 4px solid #222; 
             overflow: hidden; 
-            box-shadow: 5px 5px 10px rgba(0,0,0,0.3); 
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+            background: url('full-bg.png') repeat-x; /* Replace with your image */
+            background-size: cover;
+            background-position: center;
         }
         .background {
             position: absolute; 
-            bottom: 0; 
             width: 1600px; 
-            height: 100px; 
-            background: url('IMG_1250.jpeg') repeat-x;
+            height: 300px; 
+            background: url('full-bg.png') repeat-x; /* Replace with your image */
             background-size: cover;
             left: 0;
         }
-        .player { width: 60px; height: 60px; position: absolute; bottom: 100px; left: 50px; transition: 0.2s; }
-        .enemy-container { position: absolute; bottom: 100px; right: -50px; text-align: center; }
+        .player { width: 60px; height: 60px; position: absolute; bottom: 80px; left: 50px; transition: 0.2s; }
+        .enemy-container { position: absolute; bottom: 80px; right: -50px; text-align: center; }
         .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
         .enemy-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: red; }
         .score { position: absolute; top: 10px; right: 20px; font-size: 20px; font-weight: bold; color: #222; }
@@ -45,7 +46,7 @@
         <img src="IMG_1144.jpeg" class="player" id="player">
         <div class="enemy-container" id="enemyContainer">
             <div class="enemy-label" id="enemyLabel">Class 1</div>
-            <img src="IMAGE_1142.jpeg" class="enemy" id="enemy">
+            <img src="IMG_1142.jpeg" class="enemy" id="enemy">
         </div>
     </div>
     
@@ -69,9 +70,9 @@
         function jump() {
             if (!jumping && !gameOver) {
                 jumping = true;
-                player.style.bottom = "200px"; 
+                player.style.bottom = "180px"; 
                 setTimeout(() => {
-                    player.style.bottom = "100px";
+                    player.style.bottom = "80px";
                     jumping = false;
                 }, 600);
             } else if (gameOver) {
@@ -115,7 +116,7 @@
                 let enemyRight = parseInt(getComputedStyle(enemyContainer).right);
 
                 // Collision detection
-                if (enemyRight > (800 - playerPos - 60) && enemyRight < (800 - playerPos) && playerBottom < 130) {
+                if (enemyRight > (800 - playerPos - 60) && enemyRight < (800 - playerPos) && playerBottom < 120) {
                     message.innerHTML = `You failed in Class ${classes} 😭<br>Press SPACE to Restart`;
                     message.style.display = "block";
                     gameOver = true;
