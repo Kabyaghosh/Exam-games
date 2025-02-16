@@ -9,12 +9,13 @@
         body { text-align: center; background: #ddd; overflow: hidden; }
         h1 { color: #222; }
         .game-container { position: relative; width: 800px; height: 300px; background: #fff; margin: 50px auto; border: 4px solid #222; overflow: hidden; box-shadow: 5px 5px 10px rgba(0,0,0,0.3); }
+        .ground { position: absolute; bottom: 0; width: 1600px; height: 30px; background: #555; left: 0; }
         .player { width: 60px; height: 60px; position: absolute; bottom: 20px; left: 50px; transition: 0.2s; }
         .enemy-container { position: absolute; bottom: 20px; right: -50px; text-align: center; }
         .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
         .enemy-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: red; }
         .score { position: absolute; top: 10px; right: 20px; font-size: 20px; font-weight: bold; color: #222; }
-        .message { font-size: 24px; font-weight: bold; display: none; color: green; }
+        .message { font-size: 24px; font-weight: bold; display: none; color: green; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -22,7 +23,8 @@
     <p>Press <strong>Space</strong> to jump and avoid exams!</p>
     
     <div class="game-container">
-        <span class="score">Score: <span id="score">0</span></span>
+        <div class="ground" id="ground"></div>
+        <span class="score">Score: <span id="score">Passed Class 0</span></span>
         <img src="IMG_1144.jpeg" class="player" id="player">
         <div class="enemy-container" id="enemyContainer">
             <div class="enemy-label" id="enemyLabel">Class 1</div>
@@ -30,7 +32,7 @@
         </div>
     </div>
     
-    <p class="message" id="message"></p>
+    <p class="message" id="message">Press SPACE to Restart</p>
     
     <script>
         let player = document.getElementById("player");
@@ -39,20 +41,24 @@
         let enemy = document.getElementById("enemy");
         let message = document.getElementById("message");
         let scoreDisplay = document.getElementById("score");
+        let ground = document.getElementById("ground");
 
         let classes = 1;  
         let jumping = false;
         let score = 0;
-        let playerPos = 50; // Player starts at 50px left
+        let playerPos = 50;
+        let gameOver = false;
 
         function jump() {
-            if (!jumping) {
+            if (!jumping && !gameOver) {
                 jumping = true;
-                player.style.bottom = "150px"; // Higher jump
+                player.style.bottom = "150px"; 
                 setTimeout(() => {
                     player.style.bottom = "20px";
                     jumping = false;
-                }, 600); // Longer jump duration
+                }, 600);
+            } else if (gameOver) {
+                restartGame();
             }
         }
 
@@ -66,14 +72,21 @@
             if (classes > 12) {
                 message.innerHTML = "Congratulations! You have degrees that are useless!";
                 message.style.display = "block";
+                gameOver = true;
                 return;
             }
 
             enemyLabel.innerText = `Class ${classes}`;
             enemyContainer.style.right = "-50px";
+
             let enemyInterval = setInterval(() => {
                 let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
                 enemyContainer.style.right = (enemyPos + 5) + "px";
+
+                // Move ground to simulate running
+                let groundPos = parseInt(getComputedStyle(ground).left);
+                ground.style.left = (groundPos - 5) + "px";
+                if (groundPos <= -800) ground.style.left = "0px";
 
                 // Move player forward but stop at center (350px)
                 if (playerPos < 350) {
@@ -86,8 +99,9 @@
 
                 // Collision detection
                 if (enemyRight > (800 - playerPos - 60) && enemyRight < (800 - playerPos) && playerBottom < 50) {
-                    message.innerHTML = `You failed in Class ${classes} 😭`;
+                    message.innerHTML = `You failed in Class ${classes} 😭<br>Press SPACE to Restart`;
                     message.style.display = "block";
+                    gameOver = true;
                     clearInterval(enemyInterval);
                     return;
                 }
@@ -95,11 +109,20 @@
                 if (enemyRight >= 800) {
                     clearInterval(enemyInterval);
                     classes++;
-                    score += 10;
-                    scoreDisplay.innerText = score;
+                    scoreDisplay.innerText = `Passed Class ${classes - 1}`;
                     moveEnemy();
                 }
             }, 30);
+        }
+
+        function restartGame() {
+            gameOver = false;
+            classes = 1;
+            playerPos = 50;
+            player.style.left = "50px";
+            scoreDisplay.innerText = "Passed Class 0";
+            message.style.display = "none";
+            moveEnemy();
         }
 
         moveEnemy();
