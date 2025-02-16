@@ -19,30 +19,36 @@
             background: url('BG.png') repeat-x; 
             background-size: cover;
         }
-        .player { 
-            width: 60px; height: 60px; 
-            position: absolute; bottom: 0px; left: 100px;
-        }
-        .enemy-container { 
-            position: absolute; bottom: 0px; right: -50px; 
-            text-align: center;
-        }
+        .player { width: 60px; height: 60px; position: absolute; bottom: 80px; left: 50px; transition: 0.2s; }
+        .enemy-container { position: absolute; bottom: 80px; right: -50px; text-align: center; }
         .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
         .enemy-label {
-            font-size: 14px; font-weight: bold; margin-bottom: 5px; 
-            color: red; background-color: rgba(0, 0, 0, 0.5);
-            padding: 3px 6px; border-radius: 5px;
+            font-size: 14px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            color: red;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 3px 6px;
+            border-radius: 5px;
         }
         .score { 
             position: absolute; 
-            top: 10px; right: 20px; 
-            font-size: 20px; font-weight: bold; 
-            color: #fff; background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px; border-radius: 5px;
+            top: 10px; 
+            right: 20px; 
+            font-size: 20px; 
+            font-weight: bold; 
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.5); 
+            padding: 5px 10px;
+            border-radius: 5px;
         }
         .message { 
-            font-size: 24px; font-weight: bold; display: none; 
-            color: green; cursor: pointer; margin-top: 20px;
+            font-size: 24px; 
+            font-weight: bold; 
+            display: none; 
+            color: green; 
+            cursor: pointer; 
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -50,9 +56,9 @@
     <h1>Exam Survival Game</h1>
     <p>Press <strong>Space</strong> to jump and avoid exams!</p>
     
-    <div class="game-container" id="gameContainer">
+    <div class="game-container">
         <span class="score">Score: <span id="score">Passed Class 0</span></span>
-        <img src="hero.png" class="player" id="player">
+        <img src="Hero.png" class="player" id="player">
         <div class="enemy-container" id="enemyContainer">
             <div class="enemy-label" id="enemyLabel">Class 1</div>
             <img src="Enemy.png" class="enemy" id="enemy">
@@ -68,20 +74,20 @@
         let enemy = document.getElementById("enemy");
         let message = document.getElementById("message");
         let scoreDisplay = document.getElementById("score");
-        let gameContainer = document.getElementById("gameContainer");
 
         let classes = 1;
+        let jumping = false;
         let gameOver = false;
-        let velocityY = 0;
-        let gravity = 0.5;
-        let isOnGround = true;
-        let playerY = 0; // Start on ground
-        let jumpForce = 12;
+        let bgPos = 0;
 
         function jump() {
-            if (isOnGround && !gameOver) {
-                velocityY = -jumpForce; // Apply jump force
-                isOnGround = false; // Hero is now in the air
+            if (!jumping && !gameOver) {
+                jumping = true;
+                player.style.bottom = "180px"; 
+                setTimeout(() => {
+                    player.style.bottom = "80px";
+                    jumping = false;
+                }, 600);
             } else if (gameOver) {
                 restartGame();
             }
@@ -93,19 +99,6 @@
             }
         });
 
-        function updatePlayer() {
-            velocityY += gravity;
-            playerY += velocityY;
-
-            if (playerY > 0) { 
-                playerY = 0; 
-                isOnGround = true; 
-                velocityY = 0; 
-            }
-
-            player.style.bottom = `${playerY}px`;
-        }
-
         function moveEnemy() {
             if (classes > 12) {
                 message.innerHTML = "Congratulations! You have degrees that are useless!";
@@ -115,53 +108,35 @@
             }
 
             enemyLabel.innerText = `Class ${classes}`;
-            let enemySpeed = 2 + classes * 0.1; // Slower enemy
-            let enemyPos = 800;
+            enemyContainer.style.right = "-50px";
 
-            function enemyMoveLoop() {
-                if (gameOver) return;
+            let enemyInterval = setInterval(() => {
+                let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
+                enemyContainer.style.right = (enemyPos + 5) + "px";
 
-                enemyPos -= enemySpeed;
-                if (enemyPos < -50) {
-                    classes++;
-                    scoreDisplay.innerText = `Passed Class ${classes - 1}`;
-                    enemyContainer.style.right = "-50px";
-                    moveEnemy();
-                    return;
-                }
+                // Move background continuously
+                bgPos -= 3;
+                document.querySelector(".game-container").style.backgroundPosition = `${bgPos}px 0`;
 
-                enemyContainer.style.right = `${800 - enemyPos}px`;
+                let playerBottom = parseInt(getComputedStyle(player).bottom);
+                let enemyRight = parseInt(getComputedStyle(enemyContainer).right);
 
-                let playerRect = player.getBoundingClientRect();
-                let enemyRect = enemyContainer.getBoundingClientRect();
-
-                if (
-                    playerRect.right > enemyRect.left &&
-                    playerRect.left < enemyRect.right &&
-                    playerRect.bottom > enemyRect.top
-                ) {
+                // Collision detection
+                if (enemyRight > (800 - 110) && enemyRight < (800 - 50) && playerBottom < 120) {
                     message.innerHTML = `You failed in Class ${classes} 😭<br>Press SPACE to Restart`;
                     message.style.display = "block";
                     gameOver = true;
+                    clearInterval(enemyInterval);
                     return;
                 }
 
-                requestAnimationFrame(enemyMoveLoop);
-            }
-
-            enemyMoveLoop();
-        }
-
-        function moveBackground() {
-            let backgroundX = 0;
-            function scrollBackground() {
-                if (!gameOver) {
-                    backgroundX -= 2;
-                    gameContainer.style.backgroundPositionX = `${backgroundX}px`;
-                    requestAnimationFrame(scrollBackground);
+                if (enemyRight >= 800) {
+                    clearInterval(enemyInterval);
+                    classes++;
+                    scoreDisplay.innerText = `Passed Class ${classes - 1}`;
+                    moveEnemy();
                 }
-            }
-            scrollBackground();
+            }, 30);
         }
 
         function restartGame() {
@@ -169,22 +144,11 @@
             classes = 1;
             scoreDisplay.innerText = "Passed Class 0";
             message.style.display = "none";
-            playerY = 0;
-            isOnGround = true;
-            velocityY = 0;
+            bgPos = 0;
             moveEnemy();
         }
 
-        function gameLoop() {
-            if (!gameOver) {
-                updatePlayer();
-                requestAnimationFrame(gameLoop);
-            }
-        }
-
         moveEnemy();
-        moveBackground();
-        gameLoop();
     </script>
 </body>
 </html>
