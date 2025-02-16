@@ -7,58 +7,68 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { text-align: center; background: #ddd; overflow: hidden; }
-        h1 { color: #222; }
+        h1 { color: #222; font-size: 1.5rem; margin-top: 10px; }
+        p { font-size: 14px; margin: 5px; }
+        
         .game-container { 
             position: relative; 
-            width: 90vw; 
+            width: 90%; 
             max-width: 800px; 
-            height: 300px; 
-            margin: 50px auto; 
+            height: 250px; 
+            margin: 20px auto; 
             border: 4px solid #222; 
             overflow: hidden; 
             box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
             background: url('BG.png') repeat-x; 
             background-size: cover;
         }
+
         .player { 
-            width: 60px; height: 60px; 
-            position: absolute; bottom: 80px; left: 50px; 
-            transition: bottom 0.2s;
+            width: 60px; height: 60px; position: absolute; bottom: 80px; 
+            left: 50px; transition: 0.2s; 
         }
+
         .enemy-container { 
-            position: absolute; bottom: 80px; right: -50px; 
-            text-align: center; 
+            position: absolute; bottom: 80px; right: -60px; text-align: center; 
         }
+
         .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
+
         .enemy-label {
-            font-size: 14px; font-weight: bold; margin-bottom: 5px; 
-            color: red; background-color: rgba(0, 0, 0, 0.5);
-            padding: 3px 6px; border-radius: 5px;
+            font-size: 14px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            color: red;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 3px 6px;
+            border-radius: 5px;
         }
+
         .score { 
-            position: absolute; top: 10px; right: 20px; 
-            font-size: 20px; font-weight: bold; 
-            color: #fff; background-color: rgba(0, 0, 0, 0.5); 
-            padding: 5px 10px; border-radius: 5px;
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.5); 
+            padding: 5px 10px;
+            border-radius: 5px;
         }
+
         .message { 
-            font-size: 24px; font-weight: bold; 
-            display: none; color: green; cursor: pointer; 
+            font-size: 18px; 
+            font-weight: bold; 
+            display: none; 
+            color: green; 
+            cursor: pointer; 
             margin-top: 20px;
-        }
-        /* Mobile support */
-        @media screen and (max-width: 600px) {
-            .game-container { height: 250px; }
-            .player { width: 50px; height: 50px; }
-            .enemy { width: 40px; height: 40px; }
-            .score { font-size: 16px; }
-            .message { font-size: 18px; }
         }
     </style>
 </head>
 <body>
     <h1>Exam Survival Game</h1>
-    <p>Press <strong>Space</strong> or <strong>Tap</strong> to jump and avoid exams!</p>
+    <p>Press <strong>Space</strong> or Tap to jump and avoid exams!</p>
     
     <div class="game-container" id="gameContainer">
         <span class="score">Score: <span id="score">Passed Class 0</span></span>
@@ -69,7 +79,7 @@
         </div>
     </div>
     
-    <p class="message" id="message">Press SPACE or TAP to Restart</p>
+    <p class="message" id="message">Press SPACE or Tap to Restart</p>
 
     <script>
         let player = document.getElementById("player");
@@ -91,7 +101,7 @@
                 player.style.bottom = "180px"; 
                 setTimeout(() => {
                     player.style.bottom = "80px";
-                    setTimeout(() => jumping = false, 200);
+                    jumping = false;
                 }, 600);
             } else if (gameOver) {
                 restartGame();
@@ -104,7 +114,7 @@
             }
         });
 
-        gameContainer.addEventListener("touchstart", function() {
+        document.addEventListener("touchstart", function() {
             jump();
         });
 
@@ -117,7 +127,7 @@
             }
 
             enemyLabel.innerText = `Class ${classes}`;
-            enemyContainer.style.right = "-50px";
+            enemyContainer.style.right = "-60px";
 
             let enemyInterval = setInterval(() => {
                 let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
@@ -125,22 +135,27 @@
 
                 // Move background continuously
                 bgPos -= 3;
-                document.querySelector(".game-container").style.backgroundPosition = `${bgPos}px 0`;
+                gameContainer.style.backgroundPosition = `${bgPos}px 0`;
 
-                let playerBottom = parseInt(getComputedStyle(player).bottom);
-                let enemyRight = parseInt(getComputedStyle(enemyContainer).right);
-                let enemyLeft = 800 - enemyRight; // Adjusted for correct position tracking
+                let playerRect = player.getBoundingClientRect();
+                let enemyRect = enemy.getBoundingClientRect();
+                let gameRect = gameContainer.getBoundingClientRect();
 
-                // Collision detection (Fix)
-                if (enemyLeft >= 50 && enemyLeft <= 110 && playerBottom <= 100) {
-                    message.innerHTML = `You failed in Class ${classes} 😭<br>Press SPACE or TAP to Restart`;
+                // Correct Collision Detection
+                if (
+                    playerRect.right > enemyRect.left &&
+                    playerRect.left < enemyRect.right &&
+                    playerRect.bottom > enemyRect.top &&
+                    playerRect.top < enemyRect.bottom
+                ) {
+                    message.innerHTML = `You failed in Class ${classes} 😭<br>Press SPACE or Tap to Restart`;
                     message.style.display = "block";
                     gameOver = true;
                     clearInterval(enemyInterval);
                     return;
                 }
 
-                if (enemyRight >= 800) {
+                if (enemyRect.left <= gameRect.left) {
                     clearInterval(enemyInterval);
                     classes++;
                     scoreDisplay.innerText = `Passed Class ${classes - 1}`;
