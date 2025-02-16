@@ -22,16 +22,41 @@
             width: 1600px; /* Double size of the container */
             height: 300px; 
             left: 0;
-            background: url('BG.png') repeat-x; /* Replace with your image */
+            background: url('BG.png') repeat-x; /* Replace with your background image */
             background-size: cover;
-            transition: left 0s ease; /* To avoid jumpy transitions */
+            transition: left 0s ease;
         }
         .player { width: 60px; height: 60px; position: absolute; bottom: 80px; left: 50px; transition: 0.2s; }
         .enemy-container { position: absolute; bottom: 80px; right: -50px; text-align: center; }
         .enemy { width: 50px; height: 50px; display: block; margin: 0 auto; }
-        .enemy-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: red; }
-        .score { position: absolute; top: 10px; right: 20px; font-size: 20px; font-weight: bold; color: #222; }
-        .message { font-size: 24px; font-weight: bold; display: none; color: green; cursor: pointer; }
+        .enemy-label {
+            font-size: 14px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            color: red;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            padding: 3px 6px;
+            border-radius: 5px;
+        }
+        .score { 
+            position: absolute; 
+            top: 10px; 
+            right: 20px; 
+            font-size: 20px; 
+            font-weight: bold; 
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .message { 
+            font-size: 24px; 
+            font-weight: bold; 
+            display: none; 
+            color: green; 
+            cursor: pointer; 
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -49,8 +74,27 @@
     </div>
     
     <p class="message" id="message">Press SPACE to Restart</p>
-    
+
     <script>
+        // Preload images
+        const imagesToPreload = ['bg.png', 'hero.png', 'enemy.png'];
+        let imagesLoaded = 0;
+
+        function preloadImages(images) {
+            images.forEach(imgSrc => {
+                const img = new Image();
+                img.src = imgSrc;
+                img.onload = () => {
+                    imagesLoaded++;
+                    if (imagesLoaded === images.length) {
+                        startGame();
+                    }
+                };
+            });
+        }
+
+        preloadImages(imagesToPreload);
+
         let player = document.getElementById("player");
         let enemyContainer = document.getElementById("enemyContainer");
         let enemyLabel = document.getElementById("enemyLabel");
@@ -59,7 +103,7 @@
         let scoreDisplay = document.getElementById("score");
         let background = document.getElementById("background");
 
-        let classes = 1;  
+        let classes = 1;
         let jumping = false;
         let score = 0;
         let playerPos = 50;
@@ -143,7 +187,9 @@
             moveEnemy();
         }
 
-        moveEnemy();
+        function startGame() {
+            moveEnemy();
+        }
     </script>
 </body>
 </html>
