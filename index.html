@@ -5,20 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chrome Dino Exam Edition</title>
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Poppins', sans-serif;
-        }
-        body { 
-            text-align: center; 
-            background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b); 
-            overflow: hidden;
-            color: #fff;
-        }
-        h1 { font-size: 2.5rem; margin-top: 20px; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-        p { font-size: 18px; margin: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { text-align: center; background: #1a1a1a; color: white; overflow: hidden; }
+
+        h1 { font-size: 2rem; margin-top: 10px; text-shadow: 2px 2px 5px rgba(0, 255, 255, 0.7); }
 
         .game-container { 
             position: relative; 
@@ -26,11 +16,10 @@
             max-width: 1000px; 
             height: 300px; 
             margin: 20px auto; 
-            border: 5px solid rgba(255, 255, 255, 0.6); 
-            border-radius: 15px;
+            border: 5px solid #0ff; 
             overflow: hidden; 
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
-            background: url('BG.jpeg') repeat-x; 
+            box-shadow: 0 0 15px cyan;
+            background: url('gaming-bg.jpg') repeat-x; 
             background-size: cover;
         }
 
@@ -47,13 +36,10 @@
         .enemy { width: 70px; height: 70px; display: block; margin: 0 auto; }
 
         .enemy-label {
-            font-size: 18px; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            color: #fff;
+            font-size: 18px; font-weight: bold; 
+            margin-bottom: 5px; color: white;
             background-color: rgba(255, 0, 0, 0.7);
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 5px 10px; border-radius: 5px;
         }
 
         .score { 
@@ -63,70 +49,53 @@
             font-size: 20px; 
             font-weight: bold; 
             color: #fff;
-            background-color: rgba(0, 0, 0, 0.5); 
+            background-color: rgba(0, 0, 0, 0.7); 
             padding: 8px 15px;
             border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
         }
 
-        /* Popup Styling */
         .popup {
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 400px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
             padding: 20px;
-            border-radius: 10px;
             text-align: center;
-            display: none;
-            z-index: 10;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .popup h2 {
             font-size: 22px;
-            margin-bottom: 10px;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 0 15px cyan;
+            z-index: 999;
+            animation: popupFade 0.3s ease-in-out;
         }
 
-        .popup button {
-            background: #ff4081;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
-        }
-
-        .popup button:hover {
-            background: #d81b60;
-        }
-
-        @keyframes fadeIn {
+        @keyframes popupFade {
             from { opacity: 0; transform: translate(-50%, -60%); }
             to { opacity: 1; transform: translate(-50%, -50%); }
         }
 
-        /* Footer */
-        footer {
-            margin-top: 30px;
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
             font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: cyan;
+            color: black;
+            border-radius: 5px;
+        }
+
+        .footer {
+            margin-top: 20px;
             padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            text-align: center;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            background: rgba(0, 0, 0, 0.9);
+            font-size: 16px;
+            color: cyan;
+            text-shadow: 1px 1px 5px cyan;
         }
     </style>
 </head>
@@ -142,14 +111,13 @@
             <img src="Enemy.png" class="enemy" id="enemy">
         </div>
     </div>
-    
-    <!-- Popup for game result -->
+
     <div class="popup" id="popup">
-        <h2 id="popupMessage"></h2>
+        <p id="popupMessage"></p>
         <button onclick="restartGame()">Restart</button>
     </div>
 
-    <footer>Made by Kabya</footer>
+    <div class="footer">Made by Kabya</div>
 
     <script>
         let player = document.getElementById("player");
@@ -175,30 +143,21 @@
                 setTimeout(() => {
                     player.style.bottom = "100px";
                     jumping = false;
-                }, 1200);
+                }, 500);
             } else if (gameOver) {
                 restartGame();
             }
         }
 
-        document.addEventListener("keydown", function(event) {
-            if (event.code === "Space") {
-                jump();
-            }
+        document.addEventListener("keydown", (event) => {
+            if (event.code === "Space") jump();
         });
 
-        document.addEventListener("touchstart", function() {
-            jump();
-        });
-
-        function showPopup(message) {
-            popupMessage.innerHTML = message;
-            popup.style.display = "block";
-        }
+        document.addEventListener("touchstart", () => jump());
 
         function moveEnemy() {
             if (classes > 12) {
-                showPopup("🎓 Congratulations! You have degrees that are useless! 🎓");
+                showPopup("Congratulations! You have degrees that are useless! 🎓");
                 gameOver = true;
                 return;
             }
@@ -210,7 +169,29 @@
                 let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
                 enemyContainer.style.right = (enemyPos + 5) + "px";
 
-                if (enemyPos >= gameContainer.clientWidth - 100) {
+                if (playerPos < maxPlayerPos) {
+                    playerPos += 2;
+                    player.style.left = playerPos + "px";
+                }
+
+                bgPos -= 3;
+                gameContainer.style.backgroundPosition = `${bgPos}px 0`;
+
+                let playerRect = player.getBoundingClientRect();
+                let enemyRect = enemy.getBoundingClientRect();
+
+                if (
+                    playerRect.right > enemyRect.left &&
+                    playerRect.left < enemyRect.right &&
+                    playerRect.bottom > enemyRect.top
+                ) {
+                    showPopup(`You failed in Class ${classes} 😭`);
+                    gameOver = true;
+                    clearInterval(enemyInterval);
+                    return;
+                }
+
+                if (enemyRect.left <= 0) {
                     clearInterval(enemyInterval);
                     classes++;
                     scoreDisplay.innerText = `Passed Class ${classes - 1}`;
@@ -219,11 +200,18 @@
             }, 30);
         }
 
+        function showPopup(message) {
+            popupMessage.innerHTML = message;
+            popup.style.display = "block";
+        }
+
         function restartGame() {
             popup.style.display = "none";
             gameOver = false;
             classes = 1;
             scoreDisplay.innerText = "Passed Class 0";
+            playerPos = 50;
+            player.style.left = playerPos + "px";
             moveEnemy();
         }
 
