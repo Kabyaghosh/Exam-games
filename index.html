@@ -225,11 +225,12 @@
             gameOver = false;
             classes = 1;
             scoreDisplay.innerText = "Passed Class 0";
-            message.style.display = "none";
+            popup.style.display = "none";
             bgPos = 0;
             playerPos = 50; 
-            player.style.left = playerPos + "px";
+            player.style.left = "50px";
             moveEnemy();
+            movePlayer();
         }
 
         moveEnemy();
