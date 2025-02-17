@@ -50,27 +50,20 @@
         /* Player */
         .player {
             position: absolute;
-            bottom: 50px;
+            bottom: 20px;
             left: 50px;
-            width: 50px; /* Normal size */
-            height: 50px;
+            width: 40px; /* Back to previous size */
+            height: 40px;
+            transition: bottom 0.2s;
         }
 
         /* Enemy */
-        .enemy-container {
-            position: absolute;
-            bottom: 50px;
-            right: -80px; /* Start off-screen */
-        }
-        .enemy-label {
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-        }
         .enemy {
-            width: 50px;
-            height: 50px;
+            position: absolute;
+            bottom: 20px;
+            right: -50px; /* Start off-screen */
+            width: 40px;
+            height: 40px;
         }
 
         /* Popup */
@@ -122,12 +115,9 @@
     <p>Press <strong>Space</strong> or Tap to jump and avoid exams!</p>
     
     <div class="game-container" id="gameContainer">
-        <span class="score">Score: <span id="score">Passed Class 0</span></span>
+        <span class="score">Score: <span id="score">0</span></span>
         <img src="hero.png" class="player" id="player">
-        <div class="enemy-container" id="enemyContainer">
-            <div class="enemy-label" id="enemyLabel">Class 1</div>
-            <img src="Enemy.png" class="enemy" id="enemy">
-        </div>
+        <img src="Enemy.png" class="enemy" id="enemy">
     </div>
 
     <!-- Popup -->
@@ -142,26 +132,24 @@
 
     <script>
         let player = document.getElementById("player");
-        let enemyContainer = document.getElementById("enemyContainer");
-        let enemyLabel = document.getElementById("enemyLabel");
         let enemy = document.getElementById("enemy");
         let popup = document.getElementById("popup");
         let popupMessage = document.getElementById("popupMessage");
         let scoreDisplay = document.getElementById("score");
         let gameContainer = document.getElementById("gameContainer");
 
-        let classes = 1;
+        let score = 0;
         let jumping = false;
         let gameOver = false;
 
         function jump() {
             if (!jumping && !gameOver) {
                 jumping = true;
-                player.style.bottom = "200px"; 
+                player.style.bottom = "120px"; 
                 setTimeout(() => {
-                    player.style.bottom = "100px";
+                    player.style.bottom = "20px";
                     jumping = false;
-                }, 800);
+                }, 500);
             }
         }
 
@@ -176,41 +164,38 @@
         });
 
         function moveEnemy() {
-            if (classes > 12) {
-                popupMessage.innerHTML = "🎓 Congratulations! You passed all classes!";
-                popup.style.display = "block";
-                gameOver = true;
-                return;
-            }
+            if (gameOver) return;
 
-            enemyLabel.innerText = `Class ${classes}`;
-            enemyContainer.style.right = "-80px";
+            enemy.style.right = "-50px"; // Reset position
+            let enemySpeed = 5; // Movement speed
 
-            let enemyInterval = setInterval(() => {
-                let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
-                enemyContainer.style.right = (enemyPos + 5) + "px";
+            let moveInterval = setInterval(() => {
+                let enemyPos = parseInt(getComputedStyle(enemy).right);
+                enemy.style.right = (enemyPos + enemySpeed) + "px";
 
                 let playerRect = player.getBoundingClientRect();
                 let enemyRect = enemy.getBoundingClientRect();
                 let gameRect = gameContainer.getBoundingClientRect();
 
+                // Collision detection
                 if (
                     playerRect.right > enemyRect.left &&
                     playerRect.left < enemyRect.right &&
                     playerRect.bottom > enemyRect.top &&
                     playerRect.top < enemyRect.bottom
                 ) {
-                    popupMessage.innerHTML = `❌ You failed in Class ${classes} 😭`;
+                    popupMessage.innerHTML = `❌ Game Over! You got caught at score ${score} 😭`;
                     popup.style.display = "block";
                     gameOver = true;
-                    clearInterval(enemyInterval);
+                    clearInterval(moveInterval);
                     return;
                 }
 
+                // If enemy passes the player
                 if (enemyRect.left <= gameRect.left) {
-                    clearInterval(enemyInterval);
-                    classes++;
-                    scoreDisplay.innerText = `Passed Class ${classes - 1}`;
+                    clearInterval(moveInterval);
+                    score++;
+                    scoreDisplay.innerText = score;
                     moveEnemy();
                 }
             }, 30);
@@ -218,8 +203,8 @@
 
         function restartGame() {
             gameOver = false;
-            classes = 1;
-            scoreDisplay.innerText = "Passed Class 0";
+            score = 0;
+            scoreDisplay.innerText = "0";
             popup.style.display = "none";
             moveEnemy();
         }
