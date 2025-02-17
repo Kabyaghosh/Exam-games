@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { 
             text-align: center; 
-            background: linear-gradient(120deg, #000428, #004e92); /* Gaming background */
+            background: linear-gradient(120deg, #000428, #004e92); 
             overflow: hidden; 
             color: white;
         }
@@ -24,8 +24,8 @@
             position: relative; 
             width: 90vw; 
             max-width: 1000px; 
-            height: 300px; 
-            margin: 20px auto; 
+            height: 350px; 
+            margin: 50px auto; /* Adjusted to center */
             border: 5px solid #222; 
             overflow: hidden; 
             box-shadow: 0 0 15px cyan;
@@ -50,20 +50,20 @@
         /* Player */
         .player {
             position: absolute;
-            bottom: 20px;
+            bottom: 50px; /* Raised for a more centered position */
             left: 50px;
-            width: 40px; /* Back to previous size */
-            height: 40px;
+            width: 70px; /* Bigger */
+            height: 70px;
             transition: bottom 0.2s;
         }
 
         /* Enemy */
         .enemy {
             position: absolute;
-            bottom: 20px;
-            right: -50px; /* Start off-screen */
-            width: 40px;
-            height: 40px;
+            bottom: 50px;
+            right: -70px; /* Adjusted for bigger size */
+            width: 70px; /* Bigger */
+            height: 70px;
         }
 
         /* Popup */
@@ -141,13 +141,14 @@
         let score = 0;
         let jumping = false;
         let gameOver = false;
+        let playerSpeed = 2; // Player moves forward slowly
 
         function jump() {
             if (!jumping && !gameOver) {
                 jumping = true;
-                player.style.bottom = "120px"; 
+                player.style.bottom = "170px"; // Higher jump
                 setTimeout(() => {
-                    player.style.bottom = "20px";
+                    player.style.bottom = "50px";
                     jumping = false;
                 }, 500);
             }
@@ -166,7 +167,7 @@
         function moveEnemy() {
             if (gameOver) return;
 
-            enemy.style.right = "-50px"; // Reset position
+            enemy.style.right = "-70px"; // Reset position
             let enemySpeed = 5; // Movement speed
 
             let moveInterval = setInterval(() => {
@@ -201,15 +202,35 @@
             }, 30);
         }
 
+        function movePlayer() {
+            let playerPos = 50; // Starting left position
+            let moveInterval = setInterval(() => {
+                if (gameOver) {
+                    clearInterval(moveInterval);
+                    return;
+                }
+                playerPos += playerSpeed; // Move forward
+                player.style.left = playerPos + "px";
+
+                // Stop moving if player reaches middle
+                if (playerPos >= gameContainer.clientWidth / 3) {
+                    clearInterval(moveInterval);
+                }
+            }, 30);
+        }
+
         function restartGame() {
             gameOver = false;
             score = 0;
             scoreDisplay.innerText = "0";
             popup.style.display = "none";
+            player.style.left = "50px"; // Reset position
             moveEnemy();
+            movePlayer();
         }
 
         moveEnemy();
+        movePlayer();
     </script>
 </body>
 </html>
