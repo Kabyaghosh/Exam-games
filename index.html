@@ -65,13 +65,45 @@
             border-radius: 5px;
         }
 
-        .message { 
-            font-size: 20px; 
-            font-weight: bold; 
-            display: none; 
-            color: green; 
-            cursor: pointer; 
-            margin-top: 20px;
+      /* Popup */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 0 10px cyan;
+            z-index: 1000;
+        }
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            background: cyan;
+            color: #000;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 0 5px cyan;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: cyan;
+            font-size: 16px;
+            box-shadow: 0 -5px 10px rgba(0, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -88,7 +120,15 @@
         </div>
     </div>
     
-    <p class="message" id="message">Press SPACE or Tap to Restart</p>
+    <!-- Popup -->
+    <div class="popup" id="popup">
+        <p id="popupMessage"></p>
+        <button onclick="restartGame()">Restart</button>
+    </div>
+
+    <footer>
+        <p>Made by <strong>Kabya</strong> 🚀</p>
+    </footer>
 
     <script>
         let player = document.getElementById("player");
@@ -131,8 +171,8 @@
 
         function moveEnemy() {
             if (classes > 12) {
-                message.innerHTML = "Congratulations! You have degrees that are useless!";
-                message.style.display = "block";
+                popupMessage.innerHTML = "Congratulations! You have degrees that are useless!";
+                popup.style.display = "block";
                 gameOver = true;
                 return;
             }
@@ -165,8 +205,8 @@
                     playerRect.bottom > enemyRect.top &&
                     playerRect.top < enemyRect.bottom
                 ) {
-                    message.innerHTML = `You failed in Class ${classes} 😭<br>Press SPACE or Tap to Restart`;
-                    message.style.display = "block";
+                    popupMessage.innerHTML = `You failed in Class ${classes} 😭<br>Press SPACE or Tap to Restart`;
+                    popup.style.display = "block";
                     gameOver = true;
                     clearInterval(enemyInterval);
                     return;
