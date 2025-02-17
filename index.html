@@ -174,6 +174,18 @@
 
             enemy.style.right = "-50px"; // Reset position
             let enemySpeed = 5; // Movement speed
+            if (playerPos < maxPlayerPos) {
+                    playerPos += 2;
+                    player.style.left = playerPos + "px";
+                }
+
+                // Move background continuously
+                bgPos -= 3;
+                gameContainer.style.backgroundPosition = `${bgPos}px 0`;
+
+                let playerRect = player.getBoundingClientRect();
+                let enemyRect = enemy.getBoundingClientRect();
+                let gameRect = gameContainer.getBoundingClientRect();
 
             let moveInterval = setInterval(() => {
                 let enemyPos = parseInt(getComputedStyle(enemy).right);
