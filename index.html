@@ -6,42 +6,34 @@
     <title>Chrome Dino Exam Edition</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { text-align: center; background: #1a1a1a; color: white; overflow: hidden; }
+        body { 
+            text-align: center; 
+            background: linear-gradient(120deg, #000428, #004e92); /* Dark gaming background */
+            overflow: hidden; 
+            color: white;
+        }
+        h1 { 
+            font-size: 2.5rem; 
+            margin-top: 20px; 
+            text-shadow: 2px 2px 5px rgba(0, 255, 255, 0.7);
+        }
+        p { font-size: 18px; margin: 10px; color: #ddd; }
 
-        h1 { font-size: 2rem; margin-top: 10px; text-shadow: 2px 2px 5px rgba(0, 255, 255, 0.7); }
-
+        /* Game Container (Unchanged) */
         .game-container { 
             position: relative; 
             width: 90vw; 
             max-width: 1000px; 
             height: 300px; 
             margin: 20px auto; 
-            border: 5px solid #0ff; 
+            border: 5px solid #222; 
             overflow: hidden; 
             box-shadow: 0 0 15px cyan;
-            background: url('gaming-bg.jpg') repeat-x; 
+            background: url('BG.jpeg') repeat-x; 
             background-size: cover;
         }
 
-        .player { 
-            width: 80px; height: 80px; 
-            position: absolute; bottom: 100px; 
-            left: 50px; transition: 0.2s; 
-        }
-
-        .enemy-container { 
-            position: absolute; bottom: 100px; right: -80px; text-align: center; 
-        }
-
-        .enemy { width: 70px; height: 70px; display: block; margin: 0 auto; }
-
-        .enemy-label {
-            font-size: 18px; font-weight: bold; 
-            margin-bottom: 5px; color: white;
-            background-color: rgba(255, 0, 0, 0.7);
-            padding: 5px 10px; border-radius: 5px;
-        }
-
+        /* Score UI */
         .score { 
             position: absolute; 
             top: 10px; 
@@ -49,53 +41,56 @@
             font-size: 20px; 
             font-weight: bold; 
             color: #fff;
-            background-color: rgba(0, 0, 0, 0.7); 
+            background-color: rgba(0, 0, 0, 0.5); 
             padding: 8px 15px;
             border-radius: 5px;
+            box-shadow: 0 0 5px cyan;
         }
 
+        /* Smooth Popup Message */
         .popup {
-            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
             padding: 20px;
-            text-align: center;
+            border-radius: 10px;
+            display: none;
             font-size: 22px;
             font-weight: bold;
-            border-radius: 10px;
-            box-shadow: 0 0 15px cyan;
-            z-index: 999;
-            animation: popupFade 0.3s ease-in-out;
+            text-align: center;
+            box-shadow: 0 0 10px cyan;
+            z-index: 1000;
         }
-
-        @keyframes popupFade {
-            from { opacity: 0; transform: translate(-50%, -60%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
-        }
-
         .popup button {
             margin-top: 10px;
-            padding: 10px 20px;
+            padding: 10px 15px;
             border: none;
-            font-size: 16px;
+            background: cyan;
+            color: #000;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            background: cyan;
-            color: black;
             border-radius: 5px;
+            box-shadow: 0 0 5px cyan;
+        }
+        .popup button:hover {
+            background: #00f0f0;
         }
 
-        .footer {
-            margin-top: 20px;
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
             padding: 10px;
-            background: rgba(0, 0, 0, 0.9);
-            font-size: 16px;
+            background: rgba(0, 0, 0, 0.8);
             color: cyan;
-            text-shadow: 1px 1px 5px cyan;
+            font-size: 16px;
+            box-shadow: 0 -5px 10px rgba(0, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -112,29 +107,33 @@
         </div>
     </div>
 
+    <!-- Popup for Game Over / Win -->
     <div class="popup" id="popup">
         <p id="popupMessage"></p>
         <button onclick="restartGame()">Restart</button>
     </div>
 
-    <div class="footer">Made by Kabya</div>
+    <!-- Footer -->
+    <footer>
+        <p>Made by <strong>Kabya</strong> 🚀</p>
+    </footer>
 
     <script>
         let player = document.getElementById("player");
         let enemyContainer = document.getElementById("enemyContainer");
         let enemyLabel = document.getElementById("enemyLabel");
         let enemy = document.getElementById("enemy");
-        let scoreDisplay = document.getElementById("score");
-        let gameContainer = document.getElementById("gameContainer");
         let popup = document.getElementById("popup");
         let popupMessage = document.getElementById("popupMessage");
+        let scoreDisplay = document.getElementById("score");
+        let gameContainer = document.getElementById("gameContainer");
 
         let classes = 1;
         let jumping = false;
         let gameOver = false;
         let bgPos = 0;
-        let playerPos = 50;
-        let maxPlayerPos = gameContainer.clientWidth / 2 - 40;
+        let playerPos = 50; 
+        let maxPlayerPos = gameContainer.clientWidth / 2 - 40; 
 
         function jump() {
             if (!jumping && !gameOver) {
@@ -143,21 +142,26 @@
                 setTimeout(() => {
                     player.style.bottom = "100px";
                     jumping = false;
-                }, 500);
+                }, 1200);
             } else if (gameOver) {
                 restartGame();
             }
         }
 
-        document.addEventListener("keydown", (event) => {
-            if (event.code === "Space") jump();
+        document.addEventListener("keydown", function(event) {
+            if (event.code === "Space") {
+                jump();
+            }
         });
 
-        document.addEventListener("touchstart", () => jump());
+        document.addEventListener("touchstart", function() {
+            jump();
+        });
 
         function moveEnemy() {
             if (classes > 12) {
-                showPopup("Congratulations! You have degrees that are useless! 🎓");
+                popupMessage.innerHTML = "🎓 Congratulations! You have degrees that are useless! 😂";
+                popup.style.display = "block";
                 gameOver = true;
                 return;
             }
@@ -179,19 +183,22 @@
 
                 let playerRect = player.getBoundingClientRect();
                 let enemyRect = enemy.getBoundingClientRect();
+                let gameRect = gameContainer.getBoundingClientRect();
 
                 if (
                     playerRect.right > enemyRect.left &&
                     playerRect.left < enemyRect.right &&
-                    playerRect.bottom > enemyRect.top
+                    playerRect.bottom > enemyRect.top &&
+                    playerRect.top < enemyRect.bottom
                 ) {
-                    showPopup(`You failed in Class ${classes} 😭`);
+                    popupMessage.innerHTML = `❌ You failed in Class ${classes} 😭`;
+                    popup.style.display = "block";
                     gameOver = true;
                     clearInterval(enemyInterval);
                     return;
                 }
 
-                if (enemyRect.left <= 0) {
+                if (enemyRect.left <= gameRect.left) {
                     clearInterval(enemyInterval);
                     classes++;
                     scoreDisplay.innerText = `Passed Class ${classes - 1}`;
@@ -200,17 +207,13 @@
             }, 30);
         }
 
-        function showPopup(message) {
-            popupMessage.innerHTML = message;
-            popup.style.display = "block";
-        }
-
         function restartGame() {
-            popup.style.display = "none";
             gameOver = false;
             classes = 1;
             scoreDisplay.innerText = "Passed Class 0";
-            playerPos = 50;
+            popup.style.display = "none";
+            bgPos = 0;
+            playerPos = 50; 
             player.style.left = playerPos + "px";
             moveEnemy();
         }
