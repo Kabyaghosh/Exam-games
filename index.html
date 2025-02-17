@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrome Dino Exam Edition</title>
+    <title>Exam Survival Game</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { 
             text-align: center; 
-            background: linear-gradient(120deg, #000428, #004e92); /* Dark gaming background */
+            background: linear-gradient(120deg, #000428, #004e92); /* Gaming background */
             overflow: hidden; 
             color: white;
         }
@@ -19,7 +19,7 @@
         }
         p { font-size: 18px; margin: 10px; color: #ddd; }
 
-        /* Game Container (Unchanged) */
+        /* Game Container */
         .game-container { 
             position: relative; 
             width: 90vw; 
@@ -33,7 +33,7 @@
             background-size: cover;
         }
 
-        /* Score UI */
+        /* Score */
         .score { 
             position: absolute; 
             top: 10px; 
@@ -47,7 +47,33 @@
             box-shadow: 0 0 5px cyan;
         }
 
-        /* Smooth Popup Message */
+        /* Player */
+        .player {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            width: 50px; /* Normal size */
+            height: 50px;
+        }
+
+        /* Enemy */
+        .enemy-container {
+            position: absolute;
+            bottom: 50px;
+            right: -80px; /* Start off-screen */
+        }
+        .enemy-label {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .enemy {
+            width: 50px;
+            height: 50px;
+        }
+
+        /* Popup */
         .popup {
             position: fixed;
             top: 50%;
@@ -75,9 +101,6 @@
             cursor: pointer;
             border-radius: 5px;
             box-shadow: 0 0 5px cyan;
-        }
-        .popup button:hover {
-            background: #00f0f0;
         }
 
         /* Footer */
@@ -107,13 +130,12 @@
         </div>
     </div>
 
-    <!-- Popup for Game Over / Win -->
+    <!-- Popup -->
     <div class="popup" id="popup">
         <p id="popupMessage"></p>
         <button onclick="restartGame()">Restart</button>
     </div>
 
-    <!-- Footer -->
     <footer>
         <p>Made by <strong>Kabya</strong> 🚀</p>
     </footer>
@@ -131,9 +153,6 @@
         let classes = 1;
         let jumping = false;
         let gameOver = false;
-        let bgPos = 0;
-        let playerPos = 50; 
-        let maxPlayerPos = gameContainer.clientWidth / 2 - 40; 
 
         function jump() {
             if (!jumping && !gameOver) {
@@ -142,9 +161,7 @@
                 setTimeout(() => {
                     player.style.bottom = "100px";
                     jumping = false;
-                }, 1200);
-            } else if (gameOver) {
-                restartGame();
+                }, 800);
             }
         }
 
@@ -160,7 +177,7 @@
 
         function moveEnemy() {
             if (classes > 12) {
-                popupMessage.innerHTML = "🎓 Congratulations! You have degrees that are useless! 😂";
+                popupMessage.innerHTML = "🎓 Congratulations! You passed all classes!";
                 popup.style.display = "block";
                 gameOver = true;
                 return;
@@ -172,14 +189,6 @@
             let enemyInterval = setInterval(() => {
                 let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
                 enemyContainer.style.right = (enemyPos + 5) + "px";
-
-                if (playerPos < maxPlayerPos) {
-                    playerPos += 2;
-                    player.style.left = playerPos + "px";
-                }
-
-                bgPos -= 3;
-                gameContainer.style.backgroundPosition = `${bgPos}px 0`;
 
                 let playerRect = player.getBoundingClientRect();
                 let enemyRect = enemy.getBoundingClientRect();
@@ -212,9 +221,6 @@
             classes = 1;
             scoreDisplay.innerText = "Passed Class 0";
             popup.style.display = "none";
-            bgPos = 0;
-            playerPos = 50; 
-            player.style.left = playerPos + "px";
             moveEnemy();
         }
 
