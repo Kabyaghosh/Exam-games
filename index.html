@@ -144,8 +144,8 @@
         let jumping = false;
         let gameOver = false;
         let bgPos = 0;
-        let playerPos = 50; // Initial left position of the hero
-        let maxPlayerPos = gameContainer.clientWidth / 2 - 40; // Middle of screen limit
+        let playerPos = 50; 
+        let maxPlayerPos = gameContainer.clientWidth / 2 - 40; 
 
         function jump() {
             if (!jumping && !gameOver) {
@@ -185,13 +185,13 @@
                 let enemyPos = parseInt(getComputedStyle(enemyContainer).right);
                 enemyContainer.style.right = (enemyPos + 5) + "px";
 
-                // Move hero forward until the middle of the screen
+                
                 if (playerPos < maxPlayerPos) {
                     playerPos += 2;
                     player.style.left = playerPos + "px";
                 }
 
-                // Move background continuously
+                
                 bgPos -= 3;
                 gameContainer.style.backgroundPosition = `${bgPos}px 0`;
 
@@ -199,7 +199,7 @@
                 let enemyRect = enemy.getBoundingClientRect();
                 let gameRect = gameContainer.getBoundingClientRect();
 
-                // Collision Detection
+                
                 if (
                     playerRect.right > enemyRect.left &&
                     playerRect.left < enemyRect.right &&
